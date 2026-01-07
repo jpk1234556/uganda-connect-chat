@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Conversation } from '@/hooks/useConversations';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -32,6 +33,7 @@ export const ChatSidebar = ({
   onNewChat,
   onNewGroup,
 }: ChatSidebarProps) => {
+  const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [search, setSearch] = useState('');
 
@@ -85,7 +87,7 @@ export const ChatSidebar = ({
                 New Group
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/settings')}>
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
               </DropdownMenuItem>
