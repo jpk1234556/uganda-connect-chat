@@ -149,7 +149,7 @@ export type Database = {
           id: string
           is_online: boolean | null
           last_seen: string | null
-          phone_number: string
+          phone_number: string | null
           updated_at: string
         }
         Insert: {
@@ -159,7 +159,7 @@ export type Database = {
           id: string
           is_online?: boolean | null
           last_seen?: string | null
-          phone_number: string
+          phone_number?: string | null
           updated_at?: string
         }
         Update: {
@@ -169,7 +169,7 @@ export type Database = {
           id?: string
           is_online?: boolean | null
           last_seen?: string | null
-          phone_number?: string
+          phone_number?: string | null
           updated_at?: string
         }
         Relationships: []
