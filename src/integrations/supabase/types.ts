@@ -150,6 +150,7 @@ export type Database = {
           is_online: boolean | null
           last_seen: string | null
           phone_number: string | null
+          status_message: string | null
           updated_at: string
         }
         Insert: {
@@ -160,6 +161,7 @@ export type Database = {
           is_online?: boolean | null
           last_seen?: string | null
           phone_number?: string | null
+          status_message?: string | null
           updated_at?: string
         }
         Update: {
@@ -170,6 +172,7 @@ export type Database = {
           is_online?: boolean | null
           last_seen?: string | null
           phone_number?: string | null
+          status_message?: string | null
           updated_at?: string
         }
         Relationships: []
