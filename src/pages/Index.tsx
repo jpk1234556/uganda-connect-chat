@@ -33,9 +33,15 @@ const Index = () => {
           </div>
           <span className="text-xl font-bold">FriendChat</span>
         </div>
-        <Button onClick={() => navigate('/auth')}>
-          Get Started
-        </Button>
+        {user ? (
+          <Button onClick={() => navigate('/chat')}>
+            Go to Chat
+          </Button>
+        ) : (
+          <Button onClick={() => navigate('/auth')}>
+            Get Started
+          </Button>
+        )}
       </header>
 
       {/* Hero */}
