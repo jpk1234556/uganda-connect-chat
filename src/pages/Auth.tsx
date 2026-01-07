@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MessageCircle, Phone, Lock, User } from 'lucide-react';
+import { MessageCircle, Phone, Lock, User, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Auth = () => {
@@ -25,10 +25,10 @@ const Auth = () => {
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
-    const phone = formData.get('phone') as string;
+    const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    const { error } = await signIn(phone, password);
+    const { error } = await signIn(email, password);
 
     if (error) {
       toast.error(error.message || 'Failed to sign in');
@@ -46,6 +46,7 @@ const Auth = () => {
 
     const formData = new FormData(e.currentTarget);
     const displayName = formData.get('displayName') as string;
+    const email = formData.get('email') as string;
     const phone = formData.get('phone') as string;
     const password = formData.get('password') as string;
 
@@ -55,10 +56,20 @@ const Auth = () => {
       return;
     }
 
-    const { error } = await signUp(phone, password, displayName);
+    if (!phone) {
+      toast.error('Phone number is required for friends to find you');
+      setLoading(false);
+      return;
+    }
+
+    const { error } = await signUp(email, password, displayName, phone);
 
     if (error) {
-      toast.error(error.message || 'Failed to create account');
+      if (error.message.includes('already registered')) {
+        toast.error('This email is already registered. Please sign in.');
+      } else {
+        toast.error(error.message || 'Failed to create account');
+      }
     } else {
       toast.success('Account created! Welcome to FriendChat!');
       navigate('/chat');
@@ -92,24 +103,23 @@ const Auth = () => {
             <TabsContent value="signin" className="mt-0">
               <CardTitle className="text-xl mb-2">Welcome back</CardTitle>
               <CardDescription className="mb-6">
-                Enter your Uganda phone number to sign in
+                Enter your email to sign in
               </CardDescription>
 
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-phone">Phone Number</Label>
+                  <Label htmlFor="signin-email">Email</Label>
                   <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                      id="signin-phone"
-                      name="phone"
-                      type="tel"
-                      placeholder="0700 123 456"
+                      id="signin-email"
+                      name="email"
+                      type="email"
+                      placeholder="you@example.com"
                       className="pl-10"
                       required
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground">Uganda number (+256)</p>
                 </div>
 
                 <div className="space-y-2">
@@ -136,7 +146,7 @@ const Auth = () => {
             <TabsContent value="signup" className="mt-0">
               <CardTitle className="text-xl mb-2">Create account</CardTitle>
               <CardDescription className="mb-6">
-                Join FriendChat with your Uganda phone number
+                Join FriendChat and connect with friends
               </CardDescription>
 
               <form onSubmit={handleSignUp} className="space-y-4">
@@ -156,7 +166,22 @@ const Auth = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="signup-phone">Phone Number</Label>
+                  <Label htmlFor="signup-email">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="signup-email"
+                      name="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="signup-phone">Phone Number (Uganda)</Label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -168,7 +193,7 @@ const Auth = () => {
                       required
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground">Uganda number (+256)</p>
+                  <p className="text-xs text-muted-foreground">Friends can find you by this number (+256)</p>
                 </div>
 
                 <div className="space-y-2">

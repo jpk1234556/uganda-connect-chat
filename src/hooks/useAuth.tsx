@@ -6,8 +6,8 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (phone: string, password: string, displayName: string) => Promise<{ error: Error | null }>;
-  signIn: (phone: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, displayName: string, phoneNumber: string) => Promise<{ error: Error | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -52,26 +52,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .eq('id', userId);
   };
 
-  const signUp = async (phone: string, password: string, displayName: string) => {
+  const signUp = async (email: string, password: string, displayName: string, phoneNumber: string) => {
     // Format phone for Uganda (+256)
-    const formattedPhone = phone.startsWith('+256') ? phone : `+256${phone.replace(/^0/, '')}`;
+    const formattedPhone = phoneNumber.startsWith('+256') ? phoneNumber : `+256${phoneNumber.replace(/^0/, '')}`;
     
-    const { error } = await supabase.auth.signUp({
-      phone: formattedPhone,
+    const { data, error } = await supabase.auth.signUp({
+      email,
       password,
       options: {
-        data: { display_name: displayName }
+        emailRedirectTo: `${window.location.origin}/`,
+        data: { 
+          display_name: displayName,
+          phone_number: formattedPhone
+        }
       }
     });
+
+    // If signup successful, create/update profile with phone number
+    if (!error && data.user) {
+      await supabase.from('profiles').upsert({
+        id: data.user.id,
+        phone_number: formattedPhone,
+        display_name: displayName,
+      });
+    }
     
     return { error: error as Error | null };
   };
 
-  const signIn = async (phone: string, password: string) => {
-    const formattedPhone = phone.startsWith('+256') ? phone : `+256${phone.replace(/^0/, '')}`;
-    
+  const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
-      phone: formattedPhone,
+      email,
       password,
     });
     
